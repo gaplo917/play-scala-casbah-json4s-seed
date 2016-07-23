@@ -1,4 +1,4 @@
-import collections.{Test, TestCollection}
+import collections.{Test, TestCollection, TestNested}
 import com.mongodb.casbah.commons.MongoDBObject
 import org.scalatestplus.play.{PlaySpec, _}
 import play.api.Logger
@@ -13,6 +13,19 @@ class TestCollectionSpec extends PlaySpec with OneAppPerTest {
     "insert" in {
       val collection = app.injector.instanceOf[TestCollection]
       collection.insert(Test(name = "123")) mustBe true
+
+      collection.insert(
+        Test(
+          name = "123",
+          arrayObjs = List(
+            TestNested(address = "1"),
+            TestNested(address = "2"),
+            TestNested(address = "3"),
+            TestNested(address = "4")
+          )
+        )
+      ) mustBe true
+
     }
 
     "upsert" in {

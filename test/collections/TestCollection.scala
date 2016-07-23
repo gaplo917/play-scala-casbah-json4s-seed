@@ -14,7 +14,8 @@ case class Test(
                  _id: Option[ObjectId] = None, // mongodb will auto-generate the _id by default
                  name: String, // required
                  nickName: Option[String] = None, // if application-wise optional => should use option Type and default value = None
-                 nested: TestNested = TestNested(address = "address") // can nested object
+                 nested: TestNested = TestNested(address = "address"), // can nested object
+                 arrayObjs: List[TestNested] = List()
                ) extends MongoDBObjectId
 
 @Singleton
