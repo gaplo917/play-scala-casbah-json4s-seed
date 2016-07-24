@@ -1,4 +1,4 @@
-import collections.{Test, TestCollection, TestNested}
+import collections.{TestCollection, TestUser}
 import com.mongodb.casbah.commons.MongoDBObject
 import org.scalatestplus.play.{PlaySpec, _}
 import play.api.Logger
@@ -12,16 +12,16 @@ class TestCollectionSpec extends PlaySpec with OneAppPerTest {
   "TestCollection" should {
     "insert" in {
       val collection = app.injector.instanceOf[TestCollection]
-      collection.insert(Test(name = "123")) mustBe true
+      collection.insert(TestUser(name = "123")) mustBe true
 
       collection.insert(
-        Test(
+        TestUser(
           name = "123",
-          arrayObjs = List(
-            TestNested(address = "1"),
-            TestNested(address = "2"),
-            TestNested(address = "3"),
-            TestNested(address = "4")
+          friends = List(
+            TestUser(name = "friend1"),
+            TestUser(name = "friend2"),
+            TestUser(name = "friend3"),
+            TestUser(name = "friend4")
           )
         )
       ) mustBe true
@@ -30,7 +30,7 @@ class TestCollectionSpec extends PlaySpec with OneAppPerTest {
 
     "upsert" in {
       val collection = app.injector.instanceOf[TestCollection]
-      val obj = Test(name = "123")
+      val obj = TestUser(name = "123")
 
       val upsertedObj = collection.upsert(obj)
 
@@ -59,7 +59,7 @@ class TestCollectionSpec extends PlaySpec with OneAppPerTest {
 
     "insert & findOne" in {
       val collection = app.injector.instanceOf[TestCollection]
-      val upserted = collection.upsert(Test(name = "123"))
+      val upserted = collection.upsert(TestUser(name = "123"))
 
       upserted.flatMap(_._id) match {
         case Some(_id) =>

@@ -4,8 +4,9 @@ import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.MongoCollection
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.json4s.NoTypeHints
-import org.json4s.mongo.ObjectIdSerializer
+import org.json4s._
+import org.json4s.ext.JodaTimeSerializers
+import org.json4s.mongo._
 import org.json4s.native.Serialization
 import play.api.Logger
 
@@ -13,10 +14,18 @@ import play.api.Logger
  * Created by Gary Lo on 24/6/15.
  */
 abstract class BaseMongoCollection[T <: MongoDBObjectId](collectionName: String, mongoDAO: MongoDAO) extends MongoObjectHelper[T]{
-
-  protected implicit val formats: org.json4s.Formats = Serialization.formats(NoTypeHints) + new ObjectIdSerializer
+  protected implicit val formats: org.json4s.Formats = standardMongoSerializer
 
   protected val collection: MongoCollection = mongoDAO.db(collectionName)
+
+  protected lazy val standardMongoSerializer: Formats =
+    Serialization.formats(NoTypeHints) +
+      new ObjectIdSerializer +
+      new UUIDSerializer +
+      new DateSerializer +
+      new PatternSerializer
+
+  protected lazy val jodaTimeSerializers: List[Serializer[_]] = JodaTimeSerializers.all
 
   def findOne(query: DBObject, fields: Option[MongoDBObject] = None)(implicit m: Manifest[T]): Option[T] = {
     Logger.debug(s"db.${this.collectionName}.findOne(query = ${query.toString})")
